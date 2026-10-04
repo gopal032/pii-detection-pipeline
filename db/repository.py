@@ -2,12 +2,21 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.models import Base, Document, DocumentPage
+from dotenv import load_dotenv
 
-# Configure DB connection string (Override with environment variable DATABASE_URL if set)
-DB_URL = os.getenv(
-    "DATABASE_URL", "postgresql://postgres:Redstone@localhost:5432/pii_db"
-)
-DB_URL = "postgresql+psycopg2://postgres:Redstone@localhost:5432/pii_db"
+load_dotenv()
+
+# Fetch database credentials securely from environment variables
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "pii_db")
+
+# Construct the database URL dynamically
+DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# DB_URL = "postgresql+psycopg2://postgres:Redstone@localhost:5432/pii_db"
 
 engine = create_engine(DB_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -1,2 +1,19 @@
+# Python bytecode & cache
 __pycache__/
 *.pyc
+*.pyo
+
+# Virtual Environments
+venv/
+env/
+ENV/
+
+# Environment Variables & Secrets
+.env
+
+# Local IDE Settings
+.vscode/
+.idea/
+
+# Runtime Uploads / Temp Files
+uploads/
