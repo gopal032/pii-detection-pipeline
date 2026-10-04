@@ -2,10 +2,12 @@ import os
 from abc import ABC, abstractmethod
 import docx
 from PIL import Image
+from pptx import Presentation
 from pypdf import PdfReader
 
 
 class BaseDocumentHandler(ABC):
+    """Abstract Base Class for all document handlers."""
 
     def __init__(self, file_path: str):
         self.file_path = file_path
@@ -13,15 +15,17 @@ class BaseDocumentHandler(ABC):
 
     @abstractmethod
     def get_file_type(self) -> str:
+        """Return human-readable file category name."""
         pass
 
     @abstractmethod
     def get_page_count(self) -> int:
+        """Return total number of pages/slides."""
         pass
 
     @abstractmethod
     def get_pages_text(self) -> list[str]:
-        """Return list of text content partitioned by page number."""
+        """Return list of text strings partitioned per page/slide."""
         pass
 
 
@@ -92,6 +96,46 @@ class WordDocumentHandler(BaseDocumentHandler):
             return [f"Error reading Word document: {str(e)}"]
 
 
+class PowerPointDocumentHandler(BaseDocumentHandler):
+
+    def get_file_type(self) -> str:
+        return "PowerPoint Presentation (.pptx)"
+
+    def get_page_count(self) -> int:
+        try:
+            prs = Presentation(self.file_path)
+            return len(prs.slides)
+        except Exception:
+            return 0
+
+    def get_pages_text(self) -> list[str]:
+        try:
+            prs = Presentation(self.file_path)
+            pages_text = []
+
+            for slide in prs.slides:
+                slide_text = []
+                for shape in slide.shapes:
+                    if shape.has_text_frame:
+                        for paragraph in shape.text_frame.paragraphs:
+                            text = paragraph.text.strip()
+                            if text:
+                                slide_text.append(text)
+
+                content = (
+                    "\n".join(slide_text)
+                    if slide_text
+                    else "[No selectable text on slide]"
+                )
+                pages_text.append(content)
+
+            return (
+                pages_text if pages_text else ["[Empty Presentation Uploaded]"]
+            )
+        except Exception as e:
+            return [f"Error reading PowerPoint presentation: {str(e)}"]
+
+
 class ImageDocumentHandler(BaseDocumentHandler):
 
     def get_file_type(self) -> str:
@@ -112,6 +156,7 @@ class ImageDocumentHandler(BaseDocumentHandler):
 
 
 class DocumentHandlerFactory:
+    """Factory class to detect and return the appropriate Handler instance."""
 
     @staticmethod
     def get_handler(file_path: str) -> BaseDocumentHandler:
@@ -123,6 +168,8 @@ class DocumentHandlerFactory:
             return PDFDocumentHandler(file_path)
         elif ext in [".docx", ".doc"]:
             return WordDocumentHandler(file_path)
+        elif ext in [".pptx", ".ppt"]:
+            return PowerPointDocumentHandler(file_path)
         elif ext in [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"]:
             return ImageDocumentHandler(file_path)
         else:

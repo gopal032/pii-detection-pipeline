@@ -6,3 +6,6 @@ alternate:gopal.nayak@wipro.com
 City: Bangalore
 Gender: Male
 CreditCard: Visa 4111 1111 1111 1111
+25+ years of experience
+Worked in Geographies like Canada, US 
+LinkedIn: https://www.linkedin.com/in/gopal-nayak
