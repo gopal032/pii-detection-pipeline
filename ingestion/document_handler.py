@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
 import os
-from PIL import Image
+from abc import ABC, abstractmethod
 import docx
+from PIL import Image
 from pypdf import PdfReader
 
 
@@ -23,8 +23,8 @@ class BaseDocumentHandler(ABC):
         pass
 
     @abstractmethod
-    def get_content_preview(self) -> str:
-        """Extract readable text content for display."""
+    def get_pages_text(self) -> list[str]:
+        """Return list of text strings partitioned per page."""
         pass
 
 
@@ -36,9 +36,9 @@ class TextDocumentHandler(BaseDocumentHandler):
     def get_page_count(self) -> int:
         return 1
 
-    def get_content_preview(self) -> str:
+    def get_pages_text(self) -> list[str]:
         with open(self.file_path, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
+            return [f.read()]
 
 
 class PDFDocumentHandler(BaseDocumentHandler):
@@ -53,18 +53,15 @@ class PDFDocumentHandler(BaseDocumentHandler):
         except Exception:
             return 0
 
-    def get_content_preview(self) -> str:
+    def get_pages_text(self) -> list[str]:
         try:
             reader = PdfReader(self.file_path)
-            pages_text = []
-            for i, page in enumerate(reader.pages, start=1):
-                extracted = (
-                    page.extract_text() or "[No selectable text on page]"
-                )
-                pages_text.append(f"--- Page {i} ---\n{extracted}")
-            return "\n\n".join(pages_text)
+            return [
+                page.extract_text() or "[No selectable text on page]"
+                for page in reader.pages
+            ]
         except Exception as e:
-            return f"Error reading PDF: {str(e)}"
+            return [f"Error reading PDF: {str(e)}"]
 
 
 class WordDocumentHandler(BaseDocumentHandler):
@@ -75,7 +72,6 @@ class WordDocumentHandler(BaseDocumentHandler):
     def get_page_count(self) -> int:
         try:
             doc = docx.Document(self.file_path)
-            # Count explicit page breaks in XML
             page_breaks = 0
             for p in doc.paragraphs:
                 for run in p.runs:
@@ -88,13 +84,15 @@ class WordDocumentHandler(BaseDocumentHandler):
         except Exception:
             return 1
 
-    def get_content_preview(self) -> str:
+    def get_pages_text(self) -> list[str]:
         try:
             doc = docx.Document(self.file_path)
-            paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
-            return "\n\n".join(paragraphs)
+            full_text = "\n\n".join(
+                [p.text for p in doc.paragraphs if p.text.strip()]
+            )
+            return [full_text]
         except Exception as e:
-            return f"Error reading Word document: {str(e)}"
+            return [f"Error reading Word document: {str(e)}"]
 
 
 class ImageDocumentHandler(BaseDocumentHandler):
@@ -106,12 +104,14 @@ class ImageDocumentHandler(BaseDocumentHandler):
     def get_page_count(self) -> int:
         return 1
 
-    def get_content_preview(self) -> str:
+    def get_pages_text(self) -> list[str]:
         try:
             with Image.open(self.file_path) as img:
-                return f"[Image File Uploaded]\nFormat: {img.format}\nDimensions: {img.width} x {img.height} px\nColor Mode: {img.mode}"
+                return [
+                    f"[Image File Uploaded]\nFormat: {img.format}\nDimensions: {img.width} x {img.height} px\nColor Mode: {img.mode}"
+                ]
         except Exception as e:
-            return f"Error inspecting image: {str(e)}"
+            return [f"Error inspecting image: {str(e)}"]
 
 
 class DocumentHandlerFactory:
