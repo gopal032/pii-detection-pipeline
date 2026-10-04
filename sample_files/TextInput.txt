@@ -1,11 +1,15 @@
 This is a sample file of Gopal Nayak
-Let us detact all the constraints to start with
+Let us detect all the constraints to start with
 Ph: +91 98452 44521
-Email:gopal.nayak@gmail.com
+Email: gopal.nayak@gmail.com
 alternate:gopal.nayak@wipro.com
 City: Bangalore
 Gender: Male
-CreditCard: Visa 4111 1111 1111 1111
+Credit Card: Visa 4111 1111 1111 1111
 25+ years of experience
 Worked in Geographies like Canada, US 
 LinkedIn: https://www.linkedin.com/in/gopal-nayak
+DOB: 22-Sep-1986
+DOM: 22nd Sep 2008
+Age: 45 Years
+
