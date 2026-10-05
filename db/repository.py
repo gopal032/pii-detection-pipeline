@@ -59,3 +59,25 @@ def save_processed_document_to_db(handler, file_path, pages_processed):
         raise e
     finally:
         db.close()
+
+
+def generate_document_summary(page_records):
+    """Aggregates PII entity types and counts across all pages of a document."""
+    summary = {}
+    for page in page_records:
+        mapping = page.entity_mapping or {}
+        for placeholder, original_text in mapping.items():
+            # Extract base entity type from placeholder (e.g., "[PERSON_1]" -> "PERSON")
+            entity_type = placeholder.split("_")[0].replace("[", "")
+            
+            if entity_type not in summary:
+                summary[entity_type] = {"count": 0, "instances": set()}
+            
+            summary[entity_type]["count"] += 1
+            summary[entity_type]["instances"].add(original_text)
+            
+    # Convert sets to lists for JSON serialization
+    for entity_type in summary:
+        summary[entity_type]["instances"] = list(summary[entity_type]["instances"])
+        
+    return summary
