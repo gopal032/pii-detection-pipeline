@@ -6,8 +6,13 @@ from ingestion.document_handler import DocumentHandlerFactory
 
 app = Flask(__name__)
 
-FOLDER_PATH = "D:/Program/PIIProject/pii-detection-pipeline/sample_files"
+# BASE_DIR gets the root repository folder (one level above 'ui')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FOLDER_PATH = os.path.join(BASE_DIR, "sample_files")
 os.makedirs(FOLDER_PATH, exist_ok=True)
+
+#FOLDER_PATH = "D:/Program/PIIProject/pii-detection-pipeline/sample_files"
+#os.makedirs(FOLDER_PATH, exist_ok=True)
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
