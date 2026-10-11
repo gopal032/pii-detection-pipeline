@@ -17,3 +17,13 @@ ENV/
 
 # Runtime Uploads / Temp Files
 uploads/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.class
+
+# Office temporary lock files
+~$*.docx
+~$*.pptx
+~$*.xlsx

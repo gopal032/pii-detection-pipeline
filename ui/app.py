@@ -3,8 +3,8 @@ from db.repository import init_db, save_processed_document_to_db
 from detection.detection import detect_and_redact
 from flask import Flask, render_template_string, request
 from ingestion.document_handler import DocumentHandlerFactory
-
 app = Flask(__name__)
+
 
 FOLDER_PATH = "D:/Program/PIIProject/pii-detection-pipeline/sample_files"
 os.makedirs(FOLDER_PATH, exist_ok=True)
@@ -177,9 +177,11 @@ def home():
 
         pages_processed = []
         combined_mapping = {}
-
+        full_text = "\n".join(pages_text)
+        detect_state = {}
+        
         for raw_text in pages_text:
-          redacted_text, mapping = detect_and_redact(raw_text)
+          redacted_text, mapping = detect_and_redact(raw_text, hint_text=full_text, state=detect_state)
           pages_processed.append(
               {
                   "raw_text": raw_text,
@@ -218,4 +220,4 @@ def home():
 
 
 if __name__ == "__main__":
-  app.run(debug=True, port=8080)
+  app.run(debug=True, port=8080,use_reloader=False)
