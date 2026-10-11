@@ -9,4 +9,3 @@ pytesseract==0.3.13
 python-dotenv==1.2.4
 python_docx==1.2.0
 python_pptx==1.0.2
-SQLAlchemy==2.1.4
